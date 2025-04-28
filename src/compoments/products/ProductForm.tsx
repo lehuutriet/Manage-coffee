@@ -298,11 +298,7 @@ const ProductForm = () => {
   };
 
   const handleCancel = () => {
-    if (isEditMode) {
-      navigate(`/products/${id}`);
-    } else {
-      navigate("/products");
-    }
+    navigate("/products");
   };
 
   const handleBackToHome = () => {

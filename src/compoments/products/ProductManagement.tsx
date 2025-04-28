@@ -9,10 +9,13 @@ import {
   Coffee,
   FilterX,
   Home,
+  Tag,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import toast from "react-hot-toast";
+import DeleteConfirmModal from "./DeleteConfirmModal";
+import CategoryModal from "./CategoryModal";
 
 interface Product {
   $id: string;
@@ -49,6 +52,61 @@ const ProductManagement = () => {
     key: keyof Product | null;
     direction: "asc" | "desc";
   }>({ key: null, direction: "asc" });
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<string | null>(null);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [categoryUpdated, setCategoryUpdated] = useState(false);
+  const handleDeleteClick = (productId: string) => {
+    setProductToDelete(productId);
+    setIsDeleteModalOpen(true);
+  };
+  const handleCategoryModalClose = () => {
+    setIsCategoryModalOpen(false);
+    // Nếu có sự thay đổi trong danh mục, cập nhật lại danh sách
+    if (categoryUpdated) {
+      fetchCategories();
+      setCategoryUpdated(false);
+    }
+  };
+
+  // Hàm fetchCategories riêng để tải lại danh mục
+  const fetchCategories = async () => {
+    try {
+      const categoriesData = await getAllItems(COLLECTION_IDS.categories);
+      setCategories(categoriesData);
+      // Cập nhật cache
+      setCachedData("categoriesList", categoriesData, 10 * 60 * 1000);
+    } catch (error) {
+      console.error("Lỗi khi tải danh mục:", error);
+      toast.error("Không thể tải danh sách danh mục");
+    }
+  };
+  const handleDeleteConfirm = async () => {
+    if (!productToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      await deleteItem(COLLECTION_IDS.products, productToDelete);
+      // Cập nhật danh sách sản phẩm sau khi xóa
+      setProducts(
+        products.filter((product) => product.$id !== productToDelete)
+      );
+      // Cập nhật cache
+      setCachedData(
+        "productsList",
+        products.filter((product) => product.$id !== productToDelete),
+        5 * 60 * 1000
+      );
+      toast.success("Đã xóa sản phẩm thành công");
+    } catch (error) {
+      console.error("Lỗi khi xóa sản phẩm:", error);
+      toast.error("Không thể xóa sản phẩm");
+    } finally {
+      setIsDeleting(false);
+      setIsDeleteModalOpen(false);
+      setProductToDelete(null);
+    }
+  };
 
   const navigate = useNavigate();
 
@@ -113,30 +171,6 @@ const ProductManagement = () => {
   const getCategoryName = (categoryId: string) => {
     const category = categories.find((cat) => cat.$id === categoryId);
     return category ? category.name : "Chưa phân loại";
-  };
-
-  // Chức năng xóa sản phẩm
-  const handleDeleteProduct = async (productId: string) => {
-    if (window.confirm("Bạn có chắc muốn xóa sản phẩm này?")) {
-      setIsDeleting(true);
-      try {
-        await deleteItem(COLLECTION_IDS.products, productId);
-        // Cập nhật danh sách sản phẩm sau khi xóa
-        setProducts(products.filter((product) => product.$id !== productId));
-        // Cập nhật cache
-        setCachedData(
-          "productsList",
-          products.filter((product) => product.$id !== productId),
-          5 * 60 * 1000
-        );
-        toast.success("Đã xóa sản phẩm thành công");
-      } catch (error) {
-        console.error("Lỗi khi xóa sản phẩm:", error);
-        toast.error("Không thể xóa sản phẩm");
-      } finally {
-        setIsDeleting(false);
-      }
-    }
   };
 
   // Chức năng sắp xếp
@@ -235,13 +269,23 @@ const ProductManagement = () => {
               Quản lý tất cả sản phẩm của cửa hàng AYAI-Coffee
             </p>
           </div>
-          <button
-            onClick={handleAddNewProduct}
-            className="mt-4 md:mt-0 flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <PlusCircle className="w-5 h-5 mr-2" />
-            Thêm sản phẩm mới
-          </button>
+          <div className="mt-4 md:mt-0 flex space-x-4">
+            {/* Nút quản lý danh mục */}
+            <button
+              onClick={() => setIsCategoryModalOpen(true)}
+              className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            >
+              <Tag className="w-5 h-5 mr-2" />
+              Quản lý danh mục
+            </button>
+            <button
+              onClick={handleAddNewProduct}
+              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <PlusCircle className="w-5 h-5 mr-2" />
+              Thêm sản phẩm mới
+            </button>
+          </div>
         </div>
 
         {/* Bộ lọc và tìm kiếm */}
@@ -404,7 +448,7 @@ const ProductManagement = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                          {getCategoryName(product.category)}
+                          {getCategoryName(product.category || "")}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -436,7 +480,7 @@ const ProductManagement = () => {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleDeleteProduct(product.$id);
+                            handleDeleteClick(product.$id);
                           }}
                           className="text-red-600 hover:text-red-900"
                           disabled={isDeleting}
@@ -451,6 +495,23 @@ const ProductManagement = () => {
             </div>
           </div>
         )}
+
+        {/* Modal xác nhận xóa */}
+        <DeleteConfirmModal
+          isOpen={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          onConfirm={handleDeleteConfirm}
+          title="Xóa sản phẩm"
+          message="Bạn có chắc chắn muốn xóa sản phẩm này? Hành động này không thể hoàn tác."
+          isDeleting={isDeleting}
+        />
+
+        {/* Modal quản lý danh mục */}
+        <CategoryModal
+          isOpen={isCategoryModalOpen}
+          onClose={handleCategoryModalClose}
+          onCategoryChange={() => setCategoryUpdated(true)}
+        />
       </div>
     </div>
   );
