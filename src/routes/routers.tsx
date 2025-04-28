@@ -3,24 +3,12 @@ import { Suspense } from "react";
 import Login from "../contexts/auth/Login";
 import HomePage from "../HomePage";
 import ProtectedRoute from "./protectedRoute";
-import AdminPage from "../AdminPage";
+
 import PageNotFound from "./pageNotFound";
-import ExamManagement from "../Education/ExamManagement";
-import Exercise from "../Management/exercise";
-import Register from "../contexts/auth/Register";
-import ForgotPassword from "../contexts/auth/ForgotPassword";
-import ClassroomPage from "../Classroom/ClassroomPage";
-import ClassroomManagement from "../Classroom/ClassroomManagement";
-import Story from "../Education/Story";
-import ResetPassword from "../contexts/auth/ResetPassword";
-import LessonGrid from "../learning/LessonGrid";
-import FeedbackForm from "../Navigation/Feedback";
-import Discussion from "../Navigation/Discussion";
-import SignLanguage from "../Navigation/SignLanguage";
-import OnlineClassroom from "../Navigation/OnlineClassroom";
-import Dictionary from "../Navigation/Dictionary/Dictionary";
-import WordDetail from "../Navigation/Dictionary/WordDetail";
-import FavoriteWords from "../Navigation/FavoriteWords";
+import ProductManagement from "../compoments/products/ProductManagement";
+import ProductDetail from "../compoments/products/ProductDetail";
+import ProductForm from "../compoments/products/ProductForm";
+
 const App = () => {
   return (
     <Suspense
@@ -45,27 +33,7 @@ export const Router = createBrowserRouter([
         path: "",
         element: <Login />,
       },
-      {
-        path: "/register",
-        element: <Register />,
-      },
-      {
-        path: "/forgot-password",
-        element: <ForgotPassword />,
-      },
-      {
-        path: "/reset-password",
-        element: <ResetPassword />,
-      },
 
-      {
-        path: "/admin",
-        element: (
-          <ProtectedRoute requiredRole="Admin">
-            <AdminPage />
-          </ProtectedRoute>
-        ),
-      },
       {
         path: "/homepage",
         element: (
@@ -74,113 +42,25 @@ export const Router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
-
       {
-        path: "/favorite-words",
+        path: "/products",
         element: (
           <ProtectedRoute>
-            <FavoriteWords />
-          </ProtectedRoute>
-        ),
-      },
-      // Changed FileViewer to Exercise
-      {
-        path: "/uploadExercise",
-        element: (
-          <ProtectedRoute>
-            <Exercise />
+            <ProductManagement />
           </ProtectedRoute>
         ),
       },
       {
-        path: "/feedback",
-        element: (
-          <ProtectedRoute>
-            <FeedbackForm />
-          </ProtectedRoute>
-        ),
+        path: "/products/:id",
+        element: <ProductDetail />,
       },
       {
-        path: "/online-classroom",
-        element: (
-          <ProtectedRoute>
-            <OnlineClassroom />
-          </ProtectedRoute>
-        ),
+        path: "/products/new",
+        element: <ProductForm />,
       },
       {
-        path: "/dictionary",
-        element: (
-          <ProtectedRoute>
-            <Dictionary />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "/dictionary/:wordId",
-        element: (
-          <ProtectedRoute>
-            <WordDetail />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "/discussion",
-        element: (
-          <ProtectedRoute>
-            <Discussion />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "/story",
-        element: (
-          <ProtectedRoute>
-            <Story />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "/exam",
-        element: (
-          <ProtectedRoute>
-            <ExamManagement />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "/sign-language",
-        element: (
-          <ProtectedRoute>
-            <SignLanguage />
-          </ProtectedRoute>
-        ),
-      },
-
-      {
-        path: "/lessonGrid",
-        element: (
-          <ProtectedRoute>
-            <LessonGrid />
-          </ProtectedRoute>
-        ),
-      },
-      {
-        path: "/classroomManagement",
-        element: (
-          <ProtectedRoute>
-            <ClassroomManagement />
-          </ProtectedRoute>
-        ),
-      },
-
-      {
-        path: "/classroom/:classroomId",
-        element: (
-          <ProtectedRoute>
-            <ClassroomPage />
-          </ProtectedRoute>
-        ),
+        path: "/products/edit/:id",
+        element: <ProductForm />,
       },
     ],
     errorElement: <PageNotFound />,

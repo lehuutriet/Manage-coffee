@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "./authProvider";
-import IconEdu from "../../image/IconEdu.jpg";
-import { useNavigate, Link } from "react-router-dom";
-import { Eye, EyeOff } from "lucide-react"; // Import Eye icons
+import CoffeeIcon from "../../image/CoffeeIcon.jpg"; // You'll need to replace with appropriate icon
+import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -11,8 +11,8 @@ const Login: React.FC = () => {
   const [success, setSuccess] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // Add state for password visibility
-  const [showTransition, setShowTransition] = useState(false); // Add state for transition effect
+  const [showPassword, setShowPassword] = useState(false);
+  const [showTransition, setShowTransition] = useState(false);
   const navigate = useNavigate();
   const { account } = useAuth();
 
@@ -47,7 +47,7 @@ const Login: React.FC = () => {
       const session = await account.createEmailPasswordSession(email, password);
       const sessionKey = session.$id;
       localStorage.setItem("sessionKey", sessionKey);
-      const user = await account.get();
+      await account.get(); // Vẫn lấy thông tin người dùng nhưng không kiểm tra vai trò
       setSuccess("Đăng nhập thành công!");
       setError("");
 
@@ -61,11 +61,7 @@ const Login: React.FC = () => {
 
       setShowTransition(true);
       setTimeout(() => {
-        if (user.labels && user.labels.includes("Admin")) {
-          navigate("/admin");
-        } else {
-          navigate("/homepage");
-        }
+        navigate("/homepage"); // Luôn chuyển hướng đến homepage
       }, 2000);
     } catch (err: any) {
       if (err.message) {
@@ -78,20 +74,14 @@ const Login: React.FC = () => {
     setIsSubmitting(false);
   };
 
-  // Toggle password visibility
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
-  };
-
-  const handleSignUp = (e: React.MouseEvent) => {
-    e.preventDefault(); // Ngăn chặn hành vi mặc định
-    navigate("/register");
   };
 
   return (
     <>
       {showTransition && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-blue-600">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-amber-900">
           <div className="text-center">
             <div className="animate-bounce mb-4">
               <svg
@@ -111,39 +101,39 @@ const Login: React.FC = () => {
             <h2 className="text-2xl font-bold text-white mb-2">
               Đăng nhập thành công
             </h2>
-            <p className="text-white">
-              Đang chuyển hướng bạn đến trang tổng quan...
-            </p>
+            <p className="text-white">Đang chuyển hướng đến bảng quản lý...</p>
           </div>
         </div>
       )}
 
       <div className="min-h-screen flex">
         {/* Left Section - Image */}
-        <div className="hidden lg:flex lg:w-1/2 bg-blue-600 relative">
-          <div className="absolute inset-0 bg-gradient-to-b from-blue-500/50 to-blue-700/50"></div>
+        <div className="hidden lg:flex lg:w-1/2 bg-amber-900 relative">
+          <div className="absolute inset-0 bg-gradient-to-b from-amber-800/60 to-amber-950/80"></div>
           <img
-            src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3"
-            alt="Education Background"
+            src="https://images.unsplash.com/photo-1522992319-0365e5f081d3?ixlib=rb-4.0.3"
+            alt="Coffee Shop Background"
             className="w-full h-full object-cover"
           />
           <div className="absolute bottom-0 left-0 right-0 p-12 text-white">
-            <h2 className="text-4xl font-bold mb-4">Chào mừng bạn!</h2>
-            <p className="text-lg">Hãy bắt đầu hành trình học tập của bạn.</p>
+            <h2 className="text-4xl font-bold mb-4">Quản lý quán cà phê</h2>
+            <p className="text-lg">
+              Hệ thống quản lý hiệu quả cho cửa hàng của bạn
+            </p>
           </div>
         </div>
 
         {/* Right Section - Login Form */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gradient-to-br from-gray-50 to-gray-100">
-          <div className="w-full max-w-md space-y-8 backdrop-blur-sm bg-white/80 p-8 rounded-2xl shadow-xl border border-gray-100">
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gradient-to-br from-amber-50 to-orange-50">
+          <div className="w-full max-w-md space-y-8 backdrop-blur-sm bg-white/90 p-8 rounded-2xl shadow-xl border border-amber-100">
             <div className="text-center">
               <div className="relative inline-block">
                 <img
-                  src={IconEdu}
-                  alt="Icon Education"
+                  src={CoffeeIcon}
+                  alt="Coffee Shop Icon"
                   className="mx-auto w-20 h-20 rounded-2xl shadow-lg transform transition-transform hover:scale-105 duration-300"
                 />
-                <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center">
+                <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-amber-800 rounded-full border-2 border-white flex items-center justify-center">
                   <svg
                     className="w-3 h-3 text-white"
                     fill="none"
@@ -159,11 +149,11 @@ const Login: React.FC = () => {
                   </svg>
                 </div>
               </div>
-              <h1 className="mt-6 text-3xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
-                Chào mừng trở lại!
+              <h1 className="mt-6 text-3xl font-bold tracking-tight bg-gradient-to-r from-amber-900 to-amber-700 bg-clip-text text-transparent">
+                Đăng nhập hệ thống
               </h1>
-              <p className="mt-2 text-gray-500">
-                Vui lòng đăng nhập vào tài khoản của bạn
+              <p className="mt-2 text-gray-600">
+                Vui lòng đăng nhập để quản lý quán cà phê
               </p>
             </div>
 
@@ -181,8 +171,8 @@ const Login: React.FC = () => {
 
             <form onSubmit={handleLogin} className="space-y-6 mt-8">
               <div className="group">
-                <label className="block text-sm font-medium text-gray-700 mb-1 transition-colors group-focus-within:text-blue-600">
-                  Email address
+                <label className="block text-sm font-medium text-gray-700 mb-1 transition-colors group-focus-within:text-amber-800">
+                  Email đăng nhập
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -205,15 +195,15 @@ const Login: React.FC = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="block w-full pl-10 pr-3 py-3 appearance-none rounded-lg border border-gray-300 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    placeholder="Enter your email"
+                    className="block w-full pl-10 pr-3 py-3 appearance-none rounded-lg border border-gray-300 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200"
+                    placeholder="Nhập email của bạn"
                   />
                 </div>
               </div>
 
               <div className="group">
-                <label className="block text-sm font-medium text-gray-700 mb-1 transition-colors group-focus-within:text-blue-600">
-                  Password
+                <label className="block text-sm font-medium text-gray-700 mb-1 transition-colors group-focus-within:text-amber-800">
+                  Mật khẩu
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -236,13 +226,13 @@ const Login: React.FC = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="block w-full pl-10 pr-10 py-3 appearance-none rounded-lg border border-gray-300 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                    placeholder="Enter your password"
+                    className="block w-full pl-10 pr-10 py-3 appearance-none rounded-lg border border-gray-300 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200"
+                    placeholder="Nhập mật khẩu của bạn"
                   />
                   <button
                     type="button"
                     onClick={togglePasswordVisibility}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 hover:text-blue-500 transition-colors"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 hover:text-amber-700 transition-colors"
                   >
                     {showPassword ? (
                       <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
@@ -253,34 +243,26 @@ const Login: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="rememberMe"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
-                  />
-                  <label
-                    htmlFor="rememberMe"
-                    className="ml-2 text-sm text-gray-600 cursor-pointer hover:text-gray-800"
-                  >
-                    Remember me
-                  </label>
-                </div>
-                <Link
-                  to="/forgot-password"
-                  className="text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline transition-all duration-200"
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="rememberMe"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500 cursor-pointer"
+                />
+                <label
+                  htmlFor="rememberMe"
+                  className="ml-2 text-sm text-gray-600 cursor-pointer hover:text-gray-800"
                 >
-                  Quên Mật Khẩu?
-                </Link>
+                  Ghi nhớ đăng nhập
+                </label>
               </div>
 
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full flex justify-center py-3 px-4 rounded-lg text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 font-medium transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                className="w-full flex justify-center py-3 px-4 rounded-lg text-white bg-gradient-to-r from-amber-800 to-amber-700 hover:from-amber-900 hover:to-amber-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 font-medium transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 {isSubmitting ? (
                   <span className="flex items-center">
@@ -311,15 +293,8 @@ const Login: React.FC = () => {
                 )}
               </button>
 
-              <div className="mt-6 text-center text-sm">
-                <span className="text-gray-500">Không có tài khoản? </span>
-                <button
-                  type="button"
-                  onClick={handleSignUp}
-                  className="font-medium text-blue-600 hover:text-blue-500 hover:underline transition-all duration-200"
-                >
-                  Đăng ký ngay
-                </button>
+              <div className="mt-6 text-center text-sm text-gray-500">
+                Liên hệ quản lý cửa hàng nếu bạn quên mật khẩu
               </div>
             </form>
           </div>
