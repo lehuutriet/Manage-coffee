@@ -8,13 +8,19 @@ import {
   Package,
   Receipt,
   Calendar,
-  CreditCard,
-  Settings,
+  LogOut,
+  Tag,
+  Gift,
+  RotateCcw,
+  Truck,
+  FileText,
+  LayoutGrid,
+  Ticket,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
+import toast from "react-hot-toast";
 const HomePage = () => {
-  const { account, getAllItems, COLLECTION_IDS } = useAuth();
+  const { account, getAllItems, COLLECTION_IDS, logout } = useAuth();
   const { setCachedData, getCachedData } = useDataCache();
   const [userData, setUserData] = useState({ name: "", email: "" });
   const [isAdmin, setIsAdmin] = useState(false);
@@ -73,6 +79,16 @@ const HomePage = () => {
     getUserData();
     loadDashboardStats();
   }, [account, getAllItems, setCachedData, getCachedData]);
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success("Đăng xuất thành công");
+      navigate("/");
+    } catch (error) {
+      console.error("Lỗi khi đăng xuất:", error);
+      toast.error("Có lỗi xảy ra khi đăng xuất");
+    }
+  };
 
   const managementModules = [
     {
@@ -81,6 +97,13 @@ const HomePage = () => {
       description: "Thêm, sửa, xóa các sản phẩm của cửa hàng",
       path: "/products",
       collection: COLLECTION_IDS.products,
+    },
+    {
+      icon: Tag,
+      title: "Danh mục",
+      description: "Quản lý danh mục sản phẩm",
+      path: "/categories",
+      collection: COLLECTION_IDS.categories,
     },
     {
       icon: ShoppingBag,
@@ -118,17 +141,46 @@ const HomePage = () => {
       collection: COLLECTION_IDS.events,
     },
     {
-      icon: CreditCard,
-      title: "Giao dịch",
-      description: "Tài khoản và lịch sử giao dịch",
-      path: "/transactions",
-      collection: COLLECTION_IDS.walletTransactions,
+      icon: Ticket,
+      title: "Mã giảm giá",
+      description: "Quản lý các mã giảm giá",
+      path: "/coupons",
+      collection: COLLECTION_IDS.coupons,
     },
     {
-      icon: Settings,
-      title: "Cài đặt cửa hàng",
-      description: "Tùy chỉnh thông tin cửa hàng",
-      path: "/settings",
+      icon: Gift,
+      title: "Khuyến mãi",
+      description: "Quản lý chương trình khuyến mãi",
+      path: "/promotions",
+      collection: COLLECTION_IDS.promotions,
+    },
+    {
+      icon: RotateCcw,
+      title: "Trả hàng",
+      description: "Quản lý các đơn trả hàng",
+      path: "/returns",
+      collection: COLLECTION_IDS.returns,
+    },
+    {
+      icon: Truck,
+      title: "Nhà cung cấp",
+      description: "Quản lý nhà cung cấp",
+      path: "/suppliers",
+      collection: COLLECTION_IDS.suppliers,
+    },
+    {
+      icon: FileText,
+      title: "Giao dịch nhà cung cấp",
+      description: "Lịch sử giao dịch với nhà cung cấp",
+      path: "/supplier-transactions",
+      collection: COLLECTION_IDS.supplierTransactions,
+    },
+    {
+      icon: LayoutGrid,
+      title: "Bàn",
+      description: "Quản lý bàn trong cửa hàng",
+      path: "/tables",
+      collection: COLLECTION_IDS.tables,
     },
   ];
 
@@ -139,6 +191,17 @@ const HomePage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        {/* Nút đăng xuất ở góc phải trên cùng */}
+        <div className="flex justify-end mb-3">
+          <button
+            onClick={handleLogout}
+            className="flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Đăng xuất
+          </button>
+        </div>
+
         {/* Header */}
         <div className="bg-white shadow-lg rounded-lg p-6 mb-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center">

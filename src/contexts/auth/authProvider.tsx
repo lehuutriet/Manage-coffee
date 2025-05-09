@@ -123,8 +123,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const userId = await getCurrentUserId();
       const databaseId = userPrefs.DATABASE_ID || DATABASE_ID;
 
+      // Kiểm tra xem người dùng có phải là Admin không
+      const user = await account.get();
+      const isAdmin = user.labels && user.labels.includes("Admin");
+
       let finalQueries = [...queries];
+      // Chỉ thêm điều kiện userId nếu không phải Admin và không thuộc các collection đặc biệt
       if (
+        !isAdmin && // Không áp dụng điều kiện userId cho Admin
         collectionId !== COLLECTION_IDS.products &&
         collectionId !== COLLECTION_IDS.categories &&
         collectionId !== COLLECTION_IDS.coupons &&
